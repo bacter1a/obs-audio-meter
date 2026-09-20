@@ -33,7 +33,7 @@ export class VolumeControl {
         if (job.epoch !== this.epoch || this.client.status !== "connected") break;
         const db = current.inputVolumeMul === 0 ? -100 : current.inputVolumeDb;
         if (!Number.isFinite(db)) throw new Error("音量を取得できません");
-        const next = Math.max(-100, Math.min(26, db + delta));
+        const next = Math.max(-100, Math.min(0, db + delta));
         if (delta !== 0) await this.client.request("SetInputVolume", { ...job.target, inputVolumeDb: next });
         for (const item of batch) item.resolve(job.epoch === this.epoch && item.isCurrent() ? next : null);
         batch = [];
