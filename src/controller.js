@@ -65,6 +65,10 @@ export class MeterController {
         if (matches(data, entry.settings)) entry.meter.reset();
       }
       this.notify();
+    } else if (type === "InputVolumeChanged") {
+      const input = this.inputs.find((item) => matches(data, item));
+      if (input && Number.isFinite(data.inputVolumeDb)) input.inputVolumeDb = data.inputVolumeDb;
+      this.notify();
     } else if (["InputCreated", "InputRemoved", "InputNameChanged", "CurrentSceneCollectionChanged"].includes(type)) {
       // 古いOBSの名前指定では、名称変更時は新しい名前を選び直す。
       for (const entry of this.entries.values()) {
@@ -85,7 +89,13 @@ export class MeterController {
       const inputs = await Promise.all((result.inputs ?? []).map(async (input) => {
         try {
           const mute = await this.client.request("GetInputMute", { inputName: input.inputName });
-          return { inputName: input.inputName, inputUuid: input.inputUuid, inputMuted: !!mute.inputMuted };
+          // 音量取得に対応しない旧OBSや模擬クライアントでも一覧更新を止めない。
+          const volume = await Promise.race([
+            this.client.request("GetInputVolume", { inputName: input.inputName }),
+            new Promise((resolve) => setTimeout(() => resolve({}), 100))
+          ]);
+          return { inputName: input.inputName, inputUuid: input.inputUuid, inputMuted: !!mute.inputMuted,
+            inputVolumeDb: Number.isFinite(volume.inputVolumeDb) ? volume.inputVolumeDb : undefined };
         } catch (error) {
           // 音声を持たない映像ソースはリストから除外する。
           if (error.code === 604 || error.code === 600) return null;
@@ -125,7 +135,8 @@ export class MeterController {
     else if (source.inputMuted) status = "MUTE";
     else if (snapshot.stale) status = "音声データ待機";
     if (now < entry.controlErrorUntil) status = "音量変更エラー";
-    return { ...snapshot, volumeDb: now < entry.volumeUntil ? entry.volumeDb : undefined, showDbfs: entry.settings.showDbfs === true, name: entry.settings.label || source?.inputName || entry.settings.inputName || "OBS Audio Meter", status };
+    const volumeDb = now < entry.volumeUntil ? entry.volumeDb : source?.inputVolumeDb;
+    return { ...snapshot, volumeDb, showDbfs: entry.settings.showDbfs === true, name: entry.settings.label || source?.inputName || entry.settings.inputName || "OBS Audio Meter", status };
   }
 
   async render(entry, now = Date.now()) {
