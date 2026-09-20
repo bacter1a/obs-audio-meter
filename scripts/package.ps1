@@ -5,7 +5,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $bundle 'bin/plugin.mjs'))) { throw 
 $outputDir = Join-Path $projectRoot 'dist'
 New-Item -ItemType Directory -Path $outputDir -Force | Out-Null
 # 一意な名前で生成し、既存パッケージを削除しない。
-$output = Join-Path $outputDir ('OBSAudioMeter-0.1.0-' + [guid]::NewGuid().ToString('N').Substring(0, 8) + '.streamDeckPlugin')
+$output = Join-Path $outputDir ('OBSAudioMeter-0.1.1-' + [guid]::NewGuid().ToString('N').Substring(0, 8) + '.streamDeckPlugin')
 Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
 $archive = [System.IO.Compression.ZipFile]::Open($output, [System.IO.Compression.ZipArchiveMode]::Create)
 try {

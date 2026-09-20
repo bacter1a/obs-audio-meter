@@ -27,5 +27,5 @@
   "SDKVersion": 3,
   "Software": { "MinimumVersion": "6.9" },
   "UUID": "com.twrt.obs.audio-meter",
-  "Version": "0.1.0.0"
+  "Version": "0.1.1.0"
 }

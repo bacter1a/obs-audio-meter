@@ -6,7 +6,7 @@ const directory = new URL("../preview/", import.meta.url);
 mkdirSync(directory, { recursive: true });
 const states = [
   { name: "マイク", levels: [-18, -21], peaks: [-12, -15] },
-  { name: "デスクトップ音声", levels: [-5, -8], peaks: [0, -2], clip: true },
+  { name: "デスクトップ音声", levels: [-5, -8], peaks: [0, -2], clip: true, showDbfs: true },
   { name: "マイク", status: "MUTE" },
   { name: "デスクトップ音声", status: "OBS未接続" },
 ];

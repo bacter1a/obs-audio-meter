@@ -1,5 +1,7 @@
 export const STALE_MS = 750;
 export const HOLD_MS = 1500;
+// OBSのMedium (Type I PPM)と同じ、20 dB / 1.7秒の下降速度。
+export const DECAY_DB_PER_SECOND = 20 / 1.7;
 export const toDb = (value) => typeof value === "number" && Number.isFinite(value) && value > 0
   ? 20 * Math.log10(value) : -Infinity;
 export const formatDb = (db) => Number.isFinite(db) ? (Object.is(db, -0) ? 0 : db).toFixed(1) : "−∞";
@@ -14,6 +16,7 @@ export class Meter {
   reset() {
     this.lastAt = -Infinity;
     this.levels = [-Infinity, -Infinity];
+    this.displayLevels = [-Infinity, -Infinity];
     this.peaks = [-Infinity, -Infinity];
     this.holdUntil = [0, 0];
     this.channels = 0;
@@ -27,6 +30,8 @@ export class Meter {
     // 各チャンネルは [RMS, フェーダー・ミュート反映後のpeak, 入力peak]。
     const output = channels.map((channel) => toDb(channel?.[1]));
     this.levels = [output[0], output[1] ?? output[0]];
+    const decay = DECAY_DB_PER_SECOND * Math.max(0, now - this.lastAt) / 1000;
+    this.displayLevels = this.levels.map((level, i) => Math.max(level, this.displayLevels[i] - decay));
     for (let i = 0; i < 2; i++) {
       if (this.levels[i] >= this.peaks[i] || now >= this.holdUntil[i]) {
         this.peaks[i] = this.levels[i];
@@ -42,6 +47,7 @@ export class Meter {
     }
     return {
       levels: this.levels,
+      barLevels: this.displayLevels.map((level, i) => Math.max(this.levels[i], level - DECAY_DB_PER_SECOND * Math.max(0, now - this.lastAt) / 1000)),
       peaks: this.peaks.map((peak, i) => now < this.holdUntil[i] ? peak : this.levels[i]),
       channels: this.channels,
       stale: false,

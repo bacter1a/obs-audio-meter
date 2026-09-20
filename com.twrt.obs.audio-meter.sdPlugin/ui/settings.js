@@ -3,6 +3,7 @@ let settings = {}, globalSettings = {}, inputs = [];
 let globalLoaded = false;
 const source = document.getElementById("source");
 const label = document.getElementById("label");
+const showDbfs = document.getElementById("showDbfs");
 const address = document.getElementById("address");
 const password = document.getElementById("password");
 const status = document.getElementById("status");
@@ -29,6 +30,7 @@ window.connectElgatoStreamDeckSocket = (port, uuid, registerEvent, info, actionI
   actionUuid = actionData.action;
   settings = actionData.payload?.settings ?? {};
   label.value = settings.label || "";
+  showDbfs.checked = settings.showDbfs === true;
   renderSources();
   socket = new WebSocket(`ws://127.0.0.1:${port}`);
   socket.onopen = () => {
@@ -43,6 +45,7 @@ window.connectElgatoStreamDeckSocket = (port, uuid, registerEvent, info, actionI
     if (message.event === "didReceiveSettings") {
       settings = message.payload.settings ?? {};
       label.value = settings.label || "";
+      showDbfs.checked = settings.showDbfs === true;
       renderSources();
     } else if (message.event === "didReceiveGlobalSettings") {
       globalSettings = message.payload.settings ?? {};
@@ -66,6 +69,10 @@ source.addEventListener("change", () => {
 });
 label.addEventListener("change", () => {
   settings = { ...settings, label: label.value.trim() };
+  send("setSettings", settings);
+});
+showDbfs.addEventListener("change", () => {
+  settings = { ...settings, showDbfs: showDbfs.checked };
   send("setSettings", settings);
 });
 document.getElementById("refresh").addEventListener("click", () => send("sendToPlugin", { op: "list" }));

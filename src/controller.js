@@ -35,8 +35,9 @@ export class MeterController {
   changeSettings(id, settings) {
     const entry = this.entries.get(id);
     if (!entry) return;
-    entry.settings = settings ?? {};
-    entry.meter.reset();
+    const next = settings ?? {};
+    if (entry.settings.inputUuid !== next.inputUuid || entry.settings.inputName !== next.inputName) entry.meter.reset();
+    entry.settings = next;
     entry.lastImage = "";
   }
 
@@ -112,7 +113,7 @@ export class MeterController {
     else if (!source) status = "ソース未検出";
     else if (source.inputMuted) status = "MUTE";
     else if (snapshot.stale) status = "音声データ待機";
-    return { ...snapshot, name: entry.settings.label || source?.inputName || entry.settings.inputName || "OBS Audio Meter", status };
+    return { ...snapshot, showDbfs: entry.settings.showDbfs === true, name: entry.settings.label || source?.inputName || entry.settings.inputName || "OBS Audio Meter", status };
   }
 
   async render(entry, now = Date.now()) {

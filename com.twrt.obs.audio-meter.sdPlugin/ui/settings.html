@@ -12,6 +12,7 @@
     input, select, button { box-sizing: border-box; width: 100%; border: 1px solid #555; border-radius: 4px; padding: 8px; background: #353535; color: inherit; font: inherit; }
     button { margin-top: 9px; cursor: pointer; }
     button:hover { border-color: #31d6a0; }
+    input[type="checkbox"] { width: auto; margin-right: 6px; accent-color: #31d6a0; }
     small, p { color: #b4bec9; line-height: 1.6; }
     #status { padding: 9px; margin: 12px 0; background: #1d262e; border-radius: 4px; overflow-wrap: anywhere; }
     hr { border: 0; border-top: 1px solid #444; margin: 18px 0; }
@@ -24,7 +25,8 @@
   <button id="refresh" type="button">一覧を更新</button>
   <label for="label">表示名（空欄ならソース名）</label>
   <input id="label" maxlength="80" placeholder="マイク" />
-  <p>音量・ミュート反映後のピークをdBFSで表示します。ボタン／ダイヤルを押すか画面にタッチするとピークをリセットします。</p>
+  <label><input id="showDbfs" type="checkbox" />dBFSの数値を表示する</label>
+  <p>数値は初期状態では非表示です。メーターは素早く上がり、OBSのMedium設定と同じ速度でゆっくり下がります。ボタン／ダイヤルを押すか画面にタッチするとピークをリセットします。</p>
   <hr />
   <h2>OBS接続（すべてのメーターで共通）</h2>
   <label for="address">WebSocket接続先</label>
