@@ -1,9 +1,11 @@
 import { Meter, matches } from "./meter.js";
 import { renderMeter, imageData } from "./render.js";
+import { VolumeControl } from "./volume-control.js";
 
 export class MeterController {
   constructor(client, notify = () => {}) {
     this.client = client;
+    this.volumeControl = new VolumeControl(client);
     this.notify = notify;
     this.entries = new Map();
     this.inputs = [];
@@ -16,7 +18,7 @@ export class MeterController {
         this.inputs = [];
         this.listError = "";
         this.muteChanges = undefined;
-        for (const entry of this.entries.values()) entry.meter.reset();
+        for (const entry of this.entries.values()) { entry.meter.reset(); entry.volumeUntil = 0; entry.controlErrorUntil = 0; }
       }
       this.notify();
     });
@@ -36,7 +38,12 @@ export class MeterController {
     const entry = this.entries.get(id);
     if (!entry) return;
     const next = settings ?? {};
-    if (entry.settings.inputUuid !== next.inputUuid || entry.settings.inputName !== next.inputName) entry.meter.reset();
+    if (entry.settings.inputUuid !== next.inputUuid || entry.settings.inputName !== next.inputName) {
+      entry.meter.reset();
+      entry.volumeUntil = 0;
+      entry.controlErrorUntil = 0;
+      entry.controlRevision = (entry.controlRevision ?? 0) + 1;
+    }
     entry.settings = next;
     entry.lastImage = "";
   }
@@ -60,7 +67,11 @@ export class MeterController {
       this.notify();
     } else if (["InputCreated", "InputRemoved", "InputNameChanged", "CurrentSceneCollectionChanged"].includes(type)) {
       // 古いOBSの名前指定では、名称変更時は新しい名前を選び直す。
-      for (const entry of this.entries.values()) entry.meter.reset();
+      for (const entry of this.entries.values()) {
+        entry.meter.reset();
+        entry.volumeUntil = 0;
+        entry.controlRevision = (entry.controlRevision ?? 0) + 1;
+      }
       void this.refreshSources();
     }
   }
@@ -101,7 +112,7 @@ export class MeterController {
     return { type: "sources", status: this.client.status, message: this.listError || this.client.message, inputs: this.inputs };
   }
 
-  model(entry, now) {
+  model(entry, now = Date.now()) {
     const source = this.inputs.find((input) => matches(input, entry.settings));
     const snapshot = entry.meter.snapshot(now);
     let status = "";
@@ -113,7 +124,8 @@ export class MeterController {
     else if (!source) status = "ソース未検出";
     else if (source.inputMuted) status = "MUTE";
     else if (snapshot.stale) status = "音声データ待機";
-    return { ...snapshot, showDbfs: entry.settings.showDbfs === true, name: entry.settings.label || source?.inputName || entry.settings.inputName || "OBS Audio Meter", status };
+    if (now < entry.controlErrorUntil) status = "音量変更エラー";
+    return { ...snapshot, volumeDb: now < entry.volumeUntil ? entry.volumeDb : undefined, showDbfs: entry.settings.showDbfs === true, name: entry.settings.label || source?.inputName || entry.settings.inputName || "OBS Audio Meter", status };
   }
 
   async render(entry, now = Date.now()) {
@@ -138,4 +150,26 @@ export class MeterController {
   }
 
   resetPeak(id) { this.entries.get(id)?.meter.resetPeak(); }
+
+  async adjustVolume(id, ticks) {
+    const entry = this.entries.get(id);
+    if (!entry?.action.isDial()) return;
+    const source = this.inputs.find((input) => matches(input, entry.settings));
+    if (!source || this.client.status !== "connected") return;
+    const revision = entry.controlRevision ?? 0;
+    const epoch = this.volumeControl.epoch;
+    const isCurrent = () => this.volumeControl.epoch === epoch && this.entries.get(id) === entry && (entry.controlRevision ?? 0) === revision
+      && this.inputs.some((input) => matches(input, source));
+    const target = source.inputUuid ? { inputUuid: source.inputUuid } : { inputName: source.inputName };
+    try {
+      const db = await this.volumeControl.adjust(target, ticks, isCurrent);
+      if (db === null || !isCurrent()) return;
+      entry.controlErrorUntil = 0;
+      entry.volumeDb = db;
+      entry.volumeUntil = Date.now() + 1200;
+    } catch {
+      if (isCurrent()) entry.controlErrorUntil = Date.now() + 2000;
+    }
+    await this.render(entry);
+  }
 }

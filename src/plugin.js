@@ -46,6 +46,7 @@ class AudioMeterAction extends SingletonAction {
   }
 
   onKeyDown(ev) { controller.resetPeak(ev.action.id); }
+  onDialRotate(ev) { return controller.adjustVolume(ev.action.id, ev.payload.ticks); }
   onDialDown(ev) { controller.resetPeak(ev.action.id); }
   onTouchTap(ev) { controller.resetPeak(ev.action.id); }
 

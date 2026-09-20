@@ -3,7 +3,7 @@
   "Actions": [{
     "UUID": "com.twrt.obs.audio-meter.meter",
     "Name": "音声レベルメーター",
-    "Tooltip": "OBSの音声レベルをdBFSで表示。押すとピーク表示をリセットします。",
+    "Tooltip": "OBSの音声レベルを表示。ダイヤル回転で音量変更、押下でピークをリセットします。",
     "Controllers": ["Keypad", "Encoder"],
     "DisableAutomaticStates": true,
     "SupportedInMultiActions": false,
@@ -11,7 +11,7 @@
     "PropertyInspectorPath": "ui/settings.html",
     "Encoder": {
       "layout": "layouts/meter.json",
-      "TriggerDescription": { "Push": "ピークをリセット", "Touch": "ピークをリセット" }
+      "TriggerDescription": { "Rotate": "音量を1目盛り1 dBで変更", "Push": "ピークをリセット", "Touch": "ピークをリセット" }
     },
     "States": [{ "Image": "imgs/meter", "ShowTitle": false }]
   }],
@@ -27,5 +27,5 @@
   "SDKVersion": 3,
   "Software": { "MinimumVersion": "6.9" },
   "UUID": "com.twrt.obs.audio-meter",
-  "Version": "0.1.1.0"
+  "Version": "0.1.2.0"
 }
