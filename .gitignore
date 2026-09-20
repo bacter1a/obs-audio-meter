@@ -1,0 +1,6 @@
+node_modules/
+com.twrt.obs.audio-meter.sdPlugin/bin/
+com.twrt.obs.audio-meter.sdPlugin/logs/
+dist/
+preview/
+.npm-cache/

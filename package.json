@@ -1,0 +1,21 @@
+{
+  "name": "obs-audio-meter-streamdeck",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20.5.1" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "package": "npm run build && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package.ps1",
+    "preview": "node scripts/preview.mjs"
+  },
+  "dependencies": {
+    "@elgato/streamdeck": "2.1.2",
+    "ws": "8.21.3"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^29.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "rollup": "^4.63.1"
+  }
+}

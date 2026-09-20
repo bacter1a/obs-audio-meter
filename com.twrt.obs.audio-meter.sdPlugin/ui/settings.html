@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OBS Audio Meter</title>
+  <style>
+    :root { color-scheme: dark; font: 13px "Segoe UI", Meiryo, sans-serif; }
+    body { margin: 14px; color: #e1e6ed; background: #262626; }
+    h2 { font-size: 14px; margin: 18px 0 10px; }
+    label { display: block; margin: 12px 0 5px; }
+    input, select, button { box-sizing: border-box; width: 100%; border: 1px solid #555; border-radius: 4px; padding: 8px; background: #353535; color: inherit; font: inherit; }
+    button { margin-top: 9px; cursor: pointer; }
+    button:hover { border-color: #31d6a0; }
+    small, p { color: #b4bec9; line-height: 1.6; }
+    #status { padding: 9px; margin: 12px 0; background: #1d262e; border-radius: 4px; overflow-wrap: anywhere; }
+    hr { border: 0; border-top: 1px solid #444; margin: 18px 0; }
+  </style>
+</head>
+<body>
+  <h2>表示する音声</h2>
+  <label for="source">OBSの音声ソース</label>
+  <select id="source"><option value="">ソースを選択してください</option></select>
+  <button id="refresh" type="button">一覧を更新</button>
+  <label for="label">表示名（空欄ならソース名）</label>
+  <input id="label" maxlength="80" placeholder="マイク" />
+  <p>音量・ミュート反映後のピークをdBFSで表示します。ボタン／ダイヤルを押すか画面にタッチするとピークをリセットします。</p>
+  <hr />
+  <h2>OBS接続（すべてのメーターで共通）</h2>
+  <label for="address">WebSocket接続先</label>
+  <input id="address" value="ws://127.0.0.1:4455" spellcheck="false" />
+  <label for="password">WebSocketパスワード</label>
+  <input id="password" type="password" autocomplete="off" />
+  <button id="connect" type="button" disabled>保存して接続</button>
+  <div id="status" role="status">Stream Deckに接続中…</div>
+  <small>OBSの「ツール → WebSocketサーバー設定」で有効にしてください。OBS 28以降に対応します。パスワードはStream Deckのプラグイン共通設定に保存します。</small>
+  <script src="settings.js"></script>
+</body>
+</html>
