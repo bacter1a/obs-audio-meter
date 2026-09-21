@@ -15,7 +15,7 @@
     },
     "States": [{ "Image": "imgs/meter", "ShowTitle": false }]
   }],
-  "Author": "TWRT",
+  "Author": "bacter1a",
   "Category": "OBS Audio Meter",
   "CategoryIcon": "imgs/meter",
   "CodePath": "bin/plugin.mjs",

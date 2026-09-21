@@ -3,6 +3,8 @@
   "version": "0.1.9",
   "private": true,
   "type": "module",
+  "author": "bacter1a",
+  "license": "MIT",
   "engines": { "node": ">=20.5.1" },
   "scripts": {
     "build": "node scripts/build.mjs",
