@@ -6,7 +6,6 @@ OBSの音声ソースをStream Deckの通常ボタンとStream Deck＋のタッ�
 
 - Windows 10以降、Stream Deck 6.9以降
 - OBS Studio 28以降（OBS WebSocket 5.x）
-- 開発時：Node.js 20.5.1以降とnpm
 
 ## インストールと設定
 
