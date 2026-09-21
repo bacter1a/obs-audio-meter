@@ -9,7 +9,7 @@ OBSの音声ソースをStream Deckの通常ボタンとStream Deck＋のタッ�
 
 ## インストールと設定
 
-1. `dist`内の`OBSAudioMeter-0.1.9-*.streamDeckPlugin`をダブルクリックしてインストールします。
+1. [Releases](https://github.com/bacter1a/obs-audio-meter/releases/latest)から`OBSAudioMeter-0.1.9.streamDeckPlugin`をダウンロードし、ダブルクリックしてインストールします。
 2. OBSの「ツール → WebSocketサーバー設定」でサーバーを有効にします。
 3. Stream Deckの「OBS Audio Meter → 音声レベルメーター」を通常ボタン、またはダイヤルへ配置します。
 4. アクションの設定画面で接続先（標準は`ws://127.0.0.1:4455`）とOBS側のパスワードを入力し、「保存して接続」を押します。接続設定はこのプラグインの全メーターで共通です。
