@@ -49,3 +49,7 @@ OBSの音声ソースをStream Deckの通常ボタンとStream Deck＋のタッ�
 - [OBS WebSocketプロトコル](https://github.com/obsproject/obs-websocket/blob/master/docs/generated/protocol.md)
 - [OBS音声レベルの送信処理](https://github.com/obsproject/obs-websocket/blob/master/src/utils/Obs_VolumeMeter.cpp)
 - [Elgato ダイヤルとタッチストリップ](https://docs.elgato.com/streamdeck/sdk/guides/dials/)
+
+## ライセンス
+
+MIT License（[LICENSE](LICENSE)参照）。同梱の第三者ライブラリのライセンスは`com.bact.obs-audio-meter.sdPlugin/bin/THIRD-PARTY-NOTICES.txt`を参照してください。

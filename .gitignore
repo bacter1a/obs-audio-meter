@@ -1,6 +1,6 @@
 node_modules/
-com.twrt.obs.audio-meter.sdPlugin/bin/
-com.twrt.obs.audio-meter.sdPlugin/logs/
+com.bact.obs-audio-meter.sdPlugin/logs/
+*.log
 dist/
 preview/
 .npm-cache/
