@@ -24,7 +24,7 @@ export class MeterController {
         this.meterObserved = false;
         this.listError = "";
         this.muteChanges = undefined;
-        for (const entry of this.entries.values()) { entry.meter.reset(); entry.volumeUntil = 0; entry.controlErrorUntil = 0; }
+        for (const entry of this.entries.values()) { entry.meter.reset(); entry.volumeUntil = 0; entry.controlErrorUntil = 0; entry.controlErrorText = ""; }
       }
       this.notify();
     });
@@ -48,6 +48,7 @@ export class MeterController {
       entry.meter.reset();
       entry.volumeUntil = 0;
       entry.controlErrorUntil = 0;
+      entry.controlErrorText = "";
       entry.controlRevision = (entry.controlRevision ?? 0) + 1;
     }
     entry.settings = next;
@@ -148,7 +149,7 @@ export class MeterController {
     else if (!source) status = "ソース未検出";
     else if (source.inputMuted) status = "MUTE";
     else if (snapshot.stale) status = "音声データ待機";
-    if (now < entry.controlErrorUntil) status = "音量変更エラー";
+    if (now < entry.controlErrorUntil) status = entry.controlErrorText || "音量変更エラー";
     const volumeDb = now < entry.volumeUntil ? entry.volumeDb : source?.inputVolumeDb;
     return { ...snapshot, volumeDb, showDbfs: entry.settings.showDbfs === true, name: entry.settings.label || source?.inputName || entry.settings.inputName || "OBS Audio Meter", status };
   }
@@ -174,7 +175,29 @@ export class MeterController {
     await Promise.all([...this.entries.values()].map((entry) => this.render(entry, now)));
   }
 
-  resetPeak(id) { this.entries.get(id)?.meter.resetPeak(); }
+  async toggleMute(id) {
+    const entry = this.entries.get(id);
+    if (!entry) return;
+    const source = this.inputs.find((input) => matches(input, entry.settings));
+    if (!source || this.client.status !== "connected") return;
+    const revision = entry.controlRevision ?? 0;
+    const isCurrent = () => this.entries.get(id) === entry && (entry.controlRevision ?? 0) === revision
+      && this.client.status === "connected" && this.inputs.some((input) => matches(input, source));
+    const target = source.inputUuid ? { inputUuid: source.inputUuid } : { inputName: source.inputName };
+    try {
+      const result = await this.client.request("ToggleInputMute", target);
+      if (!isCurrent()) return;
+      source.inputMuted = !!result.inputMuted;
+      entry.controlErrorUntil = 0;
+      entry.controlErrorText = "";
+    } catch {
+      if (isCurrent()) {
+        entry.controlErrorUntil = Date.now() + 2000;
+        entry.controlErrorText = "ミュート切替エラー";
+      }
+    }
+    await this.render(entry);
+  }
 
   async adjustVolume(id, ticks) {
     const entry = this.entries.get(id);
@@ -190,10 +213,14 @@ export class MeterController {
       const db = await this.volumeControl.adjust(target, ticks, isCurrent);
       if (db === null || !isCurrent()) return;
       entry.controlErrorUntil = 0;
+      entry.controlErrorText = "";
       entry.volumeDb = db;
       entry.volumeUntil = Date.now() + 1200;
     } catch {
-      if (isCurrent()) entry.controlErrorUntil = Date.now() + 2000;
+      if (isCurrent()) {
+        entry.controlErrorUntil = Date.now() + 2000;
+        entry.controlErrorText = "音量変更エラー";
+      }
     }
     await this.render(entry);
   }

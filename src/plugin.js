@@ -45,10 +45,10 @@ class AudioMeterAction extends SingletonAction {
     return controller.renderAll();
   }
 
-  onKeyDown(ev) { controller.resetPeak(ev.action.id); }
+  onKeyDown(ev) { return controller.toggleMute(ev.action.id); }
   onDialRotate(ev) { return controller.adjustVolume(ev.action.id, ev.payload.ticks); }
-  onDialDown(ev) { controller.resetPeak(ev.action.id); }
-  onTouchTap(ev) { controller.resetPeak(ev.action.id); }
+  onDialDown(ev) { return controller.toggleMute(ev.action.id); }
+  onTouchTap(ev) { return controller.toggleMute(ev.action.id); }
 
   onPropertyInspectorDidAppear(ev) {
     inspectorContext = ev.action.id;
