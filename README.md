@@ -44,20 +44,6 @@ OBSの音声ソースをStream Deckの通常ボタンとStream Deck＋のタッ�
 - UUIDを返すOBSでは名称変更後も追従します。古いOBSで名前指定になっている場合は、名称変更後に一覧から選び直してください。
 - 音声ソースが消えた場合は`ソース未検出`を表示します。「一覧を更新」で再取得できます。
 
-## ビルド・検証
-
-このREADMEのある`obs-audio-meter`ディレクトリで実行します。既存のCONNECT 6用ビルドとは独立しています。
-
-```powershell
-npm ci
-npm run build
-npm test
-npm run package
-npm run preview
-```
-
-`npm test`は単位テストとローカル模擬OBS／模擬Stream Deckによる通信テストです。先にビルドしてください。実機・実際のOBSでの表示確認は別途必要です。プレビューは`preview/index.html`に生成されます。
-
 ## 参照
 
 - [OBS WebSocketプロトコル](https://github.com/obsproject/obs-websocket/blob/master/docs/generated/protocol.md)
