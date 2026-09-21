@@ -2,6 +2,8 @@ import { Meter, matches } from "./meter.js";
 import { renderMeter, imageData } from "./render.js";
 import { VolumeControl } from "./volume-control.js";
 
+const sourceKey = (input) => input?.inputUuid ? `uuid:${input.inputUuid}` : `name:${input?.inputName || ""}`;
+
 export class MeterController {
   constructor(client, notify = () => {}) {
     this.client = client;
@@ -9,6 +11,8 @@ export class MeterController {
     this.notify = notify;
     this.entries = new Map();
     this.inputs = [];
+    this.meterSources = new Set();
+    this.meterObserved = false;
     this.revision = 0;
     this.listError = "";
     this.muteChanges = undefined;
@@ -16,6 +20,8 @@ export class MeterController {
       if (status !== "connected") {
         this.revision++;
         this.inputs = [];
+        this.meterSources.clear();
+        this.meterObserved = false;
         this.listError = "";
         this.muteChanges = undefined;
         for (const entry of this.entries.values()) { entry.meter.reset(); entry.volumeUntil = 0; entry.controlErrorUntil = 0; }
@@ -51,6 +57,11 @@ export class MeterController {
   onEvent(type, data) {
     if (type === "InputVolumeMeters") {
       const inputs = Array.isArray(data.inputs) ? data.inputs : [];
+      for (const input of inputs) this.meterSources.add(sourceKey(input));
+      if (inputs.length) {
+        this.meterObserved = true;
+        this.inputs = this.inputs.filter((input) => this.meterSources.has(sourceKey(input)));
+      }
       for (const entry of this.entries.values()) {
         const source = inputs.find((input) => matches(input, entry.settings));
         if (source) entry.meter.update(source);
@@ -94,8 +105,9 @@ export class MeterController {
             this.client.request("GetInputVolume", { inputName: input.inputName }),
             new Promise((resolve) => setTimeout(() => resolve({}), 100))
           ]);
+          if (!Number.isFinite(volume.inputVolumeDb)) return null;
           return { inputName: input.inputName, inputUuid: input.inputUuid, inputMuted: !!mute.inputMuted,
-            inputVolumeDb: Number.isFinite(volume.inputVolumeDb) ? volume.inputVolumeDb : undefined };
+            inputVolumeDb: volume.inputVolumeDb };
         } catch (error) {
           // 音声を持たない映像ソースはリストから除外する。
           if (error.code === 604 || error.code === 600) return null;
@@ -103,7 +115,9 @@ export class MeterController {
         }
       }));
       if (revision !== this.revision) return;
-      this.inputs = inputs.filter(Boolean).sort((a, b) => a.inputName.localeCompare(b.inputName, "ja"));
+      this.inputs = inputs.filter(Boolean);
+      if (this.meterObserved) this.inputs = this.inputs.filter((input) => this.meterSources.has(sourceKey(input)));
+      this.inputs.sort((a, b) => a.inputName.localeCompare(b.inputName, "ja"));
       for (const change of this.muteChanges) {
         const input = this.inputs.find((item) => matches(change, item));
         if (input) input.inputMuted = !!change.inputMuted;

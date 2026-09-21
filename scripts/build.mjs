@@ -14,7 +14,7 @@ const bundle = await rollup({
   external: ["bufferutil", "utf-8-validate"],
 });
 try {
-  await bundle.write({ file: path.join(root, "com.twrt.obs.audio-meter.sdPlugin/bin/plugin.mjs"), format: "es" });
+  await bundle.write({ file: path.join(root, "com.bact.obs-audio-meter.sdPlugin/bin/plugin.mjs"), format: "es" });
   const notices = ["@elgato/streamdeck", "@elgato/utils", "ws", "zod"].map((name) => {
     // exportsでpackage.jsonが公開されないパッケージもあるため、実体から親をたどる。
     let directory = path.dirname(require.resolve(name));
@@ -37,7 +37,7 @@ try {
       directory = parent;
     }
   }).join("\n\n----------------------------------------\n\n");
-  writeFileSync(path.join(root, "com.twrt.obs.audio-meter.sdPlugin/bin/THIRD-PARTY-NOTICES.txt"), notices);
+  writeFileSync(path.join(root, "com.bact.obs-audio-meter.sdPlugin/bin/THIRD-PARTY-NOTICES.txt"), notices);
 } finally {
   await bundle.close();
 }

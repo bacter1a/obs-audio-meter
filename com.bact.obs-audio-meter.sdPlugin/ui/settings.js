@@ -2,6 +2,7 @@ let socket, context, actionUuid;
 let settings = {}, globalSettings = {}, inputs = [];
 let globalLoaded = false;
 const source = document.getElementById("source");
+const sourceFilter = document.getElementById("sourceFilter");
 const label = document.getElementById("label");
 const showDbfs = document.getElementById("showDbfs");
 const address = document.getElementById("address");
@@ -15,7 +16,10 @@ function send(event, payload = {}) {
 
 function renderSources() {
   source.replaceChildren(new Option("ソースを選択してください", ""));
-  for (const [index, input] of inputs.entries()) source.add(new Option(input.inputName, String(index)));
+  const query = sourceFilter.value.trim().toLocaleLowerCase();
+  for (const [index, input] of inputs.entries()) {
+    if (!query || input.inputName.toLocaleLowerCase().includes(query)) source.add(new Option(input.inputName, String(index)));
+  }
   const index = inputs.findIndex((input) => settings.inputUuid ? input.inputUuid === settings.inputUuid : input.inputName === settings.inputName);
   if (index >= 0) source.value = String(index);
   else if (settings.inputName || settings.inputUuid) {
@@ -67,6 +71,7 @@ source.addEventListener("change", () => {
   settings = { ...settings, inputName: input?.inputName || "", inputUuid: input?.inputUuid || "" };
   send("setSettings", settings);
 });
+sourceFilter.addEventListener("input", renderSources);
 label.addEventListener("change", () => {
   settings = { ...settings, label: label.value.trim() };
   send("setSettings", settings);

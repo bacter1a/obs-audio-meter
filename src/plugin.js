@@ -76,7 +76,7 @@ streamDeck.settings.onDidReceiveGlobalSettings((ev) => {
   loaded = true;
   start();
 });
-const RegisteredAction = action({ UUID: "com.twrt.obs.audio-meter.meter" })(AudioMeterAction, {});
+const RegisteredAction = action({ UUID: "com.bact.obs-audio-meter.meter" })(AudioMeterAction, {});
 streamDeck.actions.registerAction(new RegisteredAction());
 await streamDeck.connect();
 config = await streamDeck.settings.getGlobalSettings();

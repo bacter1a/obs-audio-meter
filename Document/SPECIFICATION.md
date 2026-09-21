@@ -16,7 +16,7 @@ OBS Studioの音声ソースを、Elgato Stream Deckの通常ボタンとStream 
 
 ### 2.2 Stream Deckアクション
 
-アクションUUIDは`com.twrt.obs.audio-meter.meter`とする。`Keypad`と`Encoder`の両コントローラーで同じアクションを使用する。
+アクションUUIDは`com.bact.obs-audio-meter.meter`とする。`Keypad`と`Encoder`の両コントローラーで同じアクションを使用する。
 
 - 通常ボタン: 144×144相当のSVG画像を表示
 - Stream Deck＋: ダイヤル1個あたり200×100のフィードバックレイアウトを表示
@@ -60,7 +60,7 @@ OBS Studioの音声ソースを、Elgato Stream Deckの通常ボタンとStream 
 
 ### 4.2 ソース一覧
 
-接続後に`GetInputList`を呼び出し、各入力の`GetInputMute`を取得する。音声入力でないもの、または音声情報を取得できないものは一覧から除外する。設定画面の「一覧を更新」で再取得できる。
+接続後に`GetInputList`を呼び出し、各入力の`GetInputMute`と`GetInputVolume`を取得する。`inputVolumeDb`を取得でき、かつ`InputVolumeMeters`イベントで実際にメーター値が届いた入力だけを音声ミキサー表示中の音声ソースとして一覧に残す。映像・画像など音声を持たない入力や、現在の音声ミキサーに表示されていない入力は選択肢から除外する。設定画面にはソース名の絞り込み欄を設け、入力した文字列を含む音声ソースだけを表示する。設定画面の「一覧を更新」で再取得できる。
 
 ### 4.3 音声レベル
 
@@ -138,7 +138,7 @@ dBFS = 20 × log10(inputLevelsMul)
 
 ## 9. 検証記録
 
-v0.1.5時点で自動テスト26件が成功している。テストには単体テスト、模擬OBS WebSocket、模擬Stream Deck、設定画面、ダイヤル回転の直列化・クランプ・切断破棄を含む。Elgato公式CLIのマニフェスト検証も成功している。
+v0.1.9時点で自動テスト26件が成功している。テストには単体テスト、模擬OBS WebSocket、模擬Stream Deck、設定画面、ダイヤル回転の直列化・クランプ・切断破棄を含む。Elgato公式CLIのマニフェスト検証も成功している。
 
 実機のOBS StudioとStream Deck本体を使った表示・操作確認は別途必要である。
 

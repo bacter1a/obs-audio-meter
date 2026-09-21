@@ -1,6 +1,6 @@
 {
   "name": "obs-audio-meter-streamdeck",
-  "version": "0.1.5",
+  "version": "0.1.9",
   "private": true,
   "type": "module",
   "engines": { "node": ">=20.5.1" },
